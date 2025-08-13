@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Register Page{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm rounded">
+        <div class="card-body p-4">
+          <h2 class="card-title text-center mb-4">Create Account</h2>
+
+          <!-- Flash messages -->
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <div class="alert alert-danger" role="alert">
+                <ul class="mb-0">
+                  {% for message in messages %}
+                    <li>{{ message }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <form method="post" action="{{ url_for('do_signup') }}">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="phone" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1234567890" required>
+            </div>
+
+           <div class="mb-3 position-relative">
+  <label for="password" class="form-label">Password</label>
+  <input 
+    type="password" 
+    class="form-control" 
+    id="password" 
+    name="password" 
+    placeholder="Enter password" 
+    autocomplete="new-password"  
+    required>
+  <span class="password-toggle position-absolute" 
+        style="top: 38px; right: 10px; cursor: pointer;">
+    <i id="togglePassword" class="fas fa-eye"></i>
+  </span>
+</div>
+
+<div class="mb-3 position-relative">
+  <label for="confirmpassword" class="form-label">Confirm Password</label>
+  <input 
+    type="password" 
+    class="form-control" 
+    id="confirmpassword" 
+    name="confirmpassword" 
+    placeholder="Confirm password" 
+    autocomplete="new-password" 
+    required
+  >
+  <span class="password-toggle position-absolute" 
+        style="top: 38px; right: 10px; cursor: pointer;">
+    <i id="toggleConfirmPassword" class="fas fa-eye"></i>
+  </span>
+</div>
+
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+          </form>
+
+          <p class="text-center mt-3">
+            Already have an account? <a href="{{ url_for('login_page') }}">Login here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

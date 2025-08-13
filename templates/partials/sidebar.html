@@ -1,0 +1,43 @@
+<div class="sidebar">
+
+    <!-- 🔍 Search -->
+    <form action="{{ url_for('search') }}" method="GET" class="mb-4">
+        <input type="text" name="q" placeholder="Search..." class="form-control mb-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </form>
+
+    <!-- 📁 Categories -->
+    <h5 class="mt-4">Categories</h5>
+    <ul class="list-unstyled">
+        {% for category in categories %}
+            <li>
+                <a href="{{ url_for('category_blogs', category_id=category.id) }}">
+                    {{ category.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- 🏷️ Tags -->
+    <h5 class="mt-4">Tags</h5>
+    <div class="d-flex flex-wrap gap-2">
+            {% for tag in tags %}
+                <a href="{{ url_for('tag_blogs', tag_id=tag.id) }}" class="badge">{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+
+    <!-- Recent Posts -->
+    <h5 class="mt-4">Recent Posts</h5>
+    {% for blog in recent_posts %}
+        <div class="d-flex mb-2">
+            {% if blog.image_filename %}
+                <img src="{{ url_for('static', filename='uploads/' + blog.image_filename) }}" width="60" height="60" class="me-2 rounded" alt="image">
+            {% endif %}
+            <div class="recent">
+                <a href="{{ url_for('view_blog', blog_id=blog.id) }}" class="text-dark fw-bold">{{ blog.title[:] }}...</a><br>
+                
+                <small class="text-muted">{{ blog.date_published.strftime('%b %d, %Y') }}</small>
+            </div>
+        </div>
+    {% endfor %}
+</div>

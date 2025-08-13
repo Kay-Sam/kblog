@@ -1,0 +1,14 @@
+<!-- templates/verify_code.html -->
+<form method="POST">
+    <h2>Verify Code</h2>
+    <label>Code:</label>
+    <input type="text" name="code" required>
+    <button type="submit">Verify</button>
+
+</p>
+</form>
+{% with messages = get_flashed_messages() %}
+  {% for message in messages %}
+    <p>{{ message }}</p>
+  {% endfor %}
+{% endwith %}

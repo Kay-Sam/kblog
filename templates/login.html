@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+  <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+    <h2 class="text-center mb-4">Login</h2>
+
+    <form method="post" action="/process-login" novalidate>
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash-message alert alert-{{ 'success' if category == 'success' else 'danger' }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+      <!-- Email input -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          name="email" 
+          placeholder="Enter email" 
+          required
+          autocomplete="email"
+        >
+      </div>
+
+      <!-- Password input with toggle -->
+      <div class="mb-3 position-relative">
+        <label for="password" class="form-label">Password</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          name="password" 
+          placeholder="Enter password" 
+          required 
+          autocomplete="current-password"
+        >
+        <span class="position-absolute" 
+              style="top: 38px; right: 10px; cursor: pointer;" 
+              id="togglePassword">
+          <i class="fas fa-eye"></i>
+        </span>
+      </div>
+
+      <!-- Forgot password link -->
+      <div class="mb-3 text-end">
+        <a href="{{ url_for('forgot_password') }}" class="small text-decoration-none">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Log In</button>
+    </form>
+
+    <p class="text-center mt-3">
+      Don't have an account? 
+      <a href="{{ url_for('sign_up') }}">Sign up</a>
+    </p>
+  </div>
+</div>
+
+
+
+{% endblock %}
+

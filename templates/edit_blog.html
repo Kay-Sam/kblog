@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %} Edit Blog {% endblock %}
+
+{% block content %}
+<h1 style="opacity: 0.6; margin-top:40px;" class="text-center" >Edit Blog</h1>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('edit_blog', blog_id=blog.id) }}" enctype="multipart/form-data">
+                        <!-- Title Field -->
+                        <div class="form-group">
+                            <label for="title" class="font-weight-bold">Title:</label>
+                            <input type="text" name="title" class="form-control" value="{{ blog.title }}" required>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="form-group">
+                            <label for="description" class="font-weight-bold">Description:</label>
+                            <textarea name="description" class="form-control" rows="5" required>{{ blog.description }}</textarea>
+                        </div>
+
+                                                        <!-- Image Upload Field -->
+                    <div class="form-group">
+                        <label for="image" class="font-weight-bold">Upload Image (Optional):</label>
+                        <input type="file" name="image" id="image" class="form-control-file" accept="image/*" onchange="previewNewImage(event)">
+
+                        <!-- Show current image -->
+                        {% if blog.image_filename %}
+                            <div class="mt-2">
+                                <img id="currentImage" src="{{ url_for('static', filename='uploads/' ~ blog.image_filename) }}" alt="Current Image" width="200" style="border-radius: 5px; border: 1px solid #ddd;">
+                            </div>
+                        {% endif %}
+
+                        <!-- Preview of new uploaded image -->
+                        <div class="mt-2">
+                            <img id="newImagePreview" src="#" alt="New Image Preview" style="display:none; max-width: 200px; border-radius: 5px; border: 1px solid #ddd;">
+                        </div>
+                    </div>
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn create-blog btn-block">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function previewNewImage(event) {
+    const newImagePreview = document.getElementById('newImagePreview');
+    const currentImage = document.getElementById('currentImage');
+    const file = event.target.files[0];
+
+    if (file) {
+        newImagePreview.src = URL.createObjectURL(file);
+        newImagePreview.style.display = 'block';
+
+        // Hide the current image when a new one is selected
+        if (currentImage) {
+            currentImage.style.display = 'none';
+        }
+    } else {
+        newImagePreview.style.display = 'none';
+        if (currentImage) {
+            currentImage.style.display = 'block';
+        }
+    }
+}
+</script>
+{% endblock %}

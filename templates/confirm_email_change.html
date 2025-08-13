@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Email Change Confirmed
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 500px; padding: 30px; text-align: center;">
+        <h2 class="mb-4 text-success">Email Change Confirmed!</h2>
+        <p>Your email has been updated successfully</p>
+        <!-- <p><strong>{{ new_email }}</strong></p> -->
+        <p>Please <a href="{{ url_for('login') }}">log in</a> with your new email address.</p>
+    </div>
+</div>
+{% endblock %}

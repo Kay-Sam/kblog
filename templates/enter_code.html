@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Enter Code{% endblock %}
+{% block content %}
+<div class="form-container">
+    <p class="title">Enter Reset Code</p>
+    <form method="post">
+        <input type="text" name="code" placeholder="Enter 6-digit code" required class="input">
+        <button class="form-btn">Verify Code</button>
+            <p>Didn't receive the code? 
+  <a href="{{ url_for('forgot_password') }}">Resend Code</a>
+    </form>
+</div>
+{% endblock %}

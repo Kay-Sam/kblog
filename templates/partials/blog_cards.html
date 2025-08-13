@@ -1,0 +1,21 @@
+{% if blogs.items %}
+    {% for blog in blogs.items %}
+        <div class="blog-card-custom">
+            {% if blog.image_filename %}
+                <img src="{{ url_for('static', filename='uploads/' + blog.image_filename) }}" alt="Blog Image" class="blog-image-custom">
+            {% endif %}
+            <div class="blog-content-custom">
+                <h2 class="blog-title-custom">{{ blog.title }}</h2>
+<p class="blog-description-custom">
+    {{ blog.description.split()[:20] | join(' ') }}{% if blog.description.split()|length > 20 %}...{% endif %}
+</p>
+                <small class="blog-meta-custom">
+                    <i class="fas fa-user"></i> Posted by {{ blog.user.username }} on {{ blog.date_published.strftime('%B %d, %Y') }}
+                </small>
+                <a href="{{ url_for('view_blog', blog_id=blog.id) }}" class="btn btn-info btn-sm mt-2">Read More</a>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">No blog posts found.</p>
+{% endif %}

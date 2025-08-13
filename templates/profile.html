@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 style="opacity: 0.6; margin-top:40px;" class="text-center" >Profile</h1>
+<div class="profile-container">
+    <div class="profile-card">
+        <h3>Username: {{ current_user.username }}</h3>  <!-- Changed 'user' to 'current_user' -->
+        <p>Email: {{ current_user.email }}</p>
+        <p>Member Since: {{ current_user.created.strftime('%B %d, %Y') }}</p>
+        <p><strong>Total Posts:</strong> {{ post_count }}</p>  <!-- Display Post Count -->
+
+ <p><strong>Total Blog Views:</strong> {{ total_views }}</p>
+
+<h4 class="mt-4">Your Blog Posts</h4>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Date</th>
+      <th>Views</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for blog in user_blogs %}
+    <tr>
+      <td>{{ blog.title }}</td>
+      <td>{{ blog.date_published.strftime('%b %d, %Y') }}</td>
+      <td>{{ blog.views }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+ 
+        <a href="{{ url_for('settings') }}" class="btn btn-primary">Edit Profile</a>
+    </div>
+</div>
+{% endblock %}
