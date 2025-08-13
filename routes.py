@@ -143,7 +143,7 @@ Click the link below to verify your email and activate your account:
 
 {confirm_url}
 
-This link will expire in 30 minutes.
+This link will expire in 1 hour.
 
 If you did not sign up, please ignore this email."""
     )
@@ -155,7 +155,7 @@ If you did not sign up, please ignore this email."""
 @app.route('/verify-email/<token>')
 def verify_email(token):
     try:
-        email = serializer.loads(token, salt='email-confirm', max_age=1800)  # 30 minutes
+        email = serializer.loads(token, salt='email-confirm', max_age=3600)  # 1 hour
     except Exception:
         flash('The confirmation link is invalid or has expired.', 'danger')
         return redirect(url_for('login_page'))
