@@ -3,7 +3,9 @@ import pathlib
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'kaysam'
-    # SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(
+    pathlib.Path().absolute(), 'data.db')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Email settings

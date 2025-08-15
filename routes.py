@@ -1,7 +1,8 @@
 from datetime import timedelta
 import hashlib
 import os
-from flask import flash, redirect, request, render_template, session, url_for, send_from_directory,abort
+from flask import flash, redirect, request, render_template, session, url_for, send_from_directory,abort, send_file
+import pathlib
 from flask_mail import Mail, Message
 from app import app,db,mail
 from models import Blog, User, Comment, Category, Tag
@@ -746,3 +747,8 @@ def resend_reset():
     except Exception as e:
         flash("Failed to send email. Please try again later.", "danger")
         return redirect(url_for('forgot_password'))
+    
+@app.route("/download-db")
+def download_db():
+    db_path = pathlib.Path().absolute() / "data.db"
+    return send_file(db_path, as_attachment=True)
