@@ -48,35 +48,80 @@ def home_page(page=1):
         categories=categories,
         tags=tags
     )
-
 @app.route('/admin')
-def admin_page():
-    # Check if user is logged in
+def admin():
+    # Ensure the user is logged in
     if 'user_id' not in session:
-        flash("You need to log in first.", "danger")
-        return redirect(url_for('login_page'))
+        flash('You must log in as admin to access this page.', 'error')
+        return redirect(url_for('login'))
 
-    # Get the logged-in user from DB
-    user = User.query.get(session['user_id'])
+    current_user = User.query.get(session['user_id'])
 
-    # Check if user is admin
-    if not user.is_admin:
-        flash("You do not have access to this page.", "danger")
+    # Check if current user is admin
+    if not current_user or not current_user.is_admin:
+        flash("You do not have permission to view this page.", "danger")
         return redirect(url_for('home_page'))
 
-    # Only admin can reach this
+    # Get all users
     users = User.query.all()
-    return render_template('admin.html', users=users)
+
+    # Prepare data for each user: post count + total views
+    user_stats = []
+    for user in users:
+        post_count = Blog.query.filter_by(user_id=user.id).count()
+        total_views = db.session.query(db.func.sum(Blog.views)).filter_by(user_id=user.id).scalar() or 0
+        user_stats.append({
+            "user": user,
+            "post_count": post_count,
+            "total_views": total_views
+        })
+
+    # Get all posts (for deletion option)
+    posts = Blog.query.order_by(Blog.date_published.desc()).all()
+
+    return render_template(
+        'admin.html',
+        current_user=current_user,
+        users=user_stats,
+        posts=posts
+    )
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+def delete_post(post_id):
+    if 'user_id' not in session:
+        flash('You must log in as admin.', 'error')
+        return redirect(url_for('login'))
+
+    current_user = User.query.get(session['user_id'])
+    if not current_user or not current_user.is_admin:
+        flash("Permission denied.", "danger")
+        return redirect(url_for('home_page'))
+
+    post = Blog.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    flash("Post deleted successfully.", "success")
+    return redirect(url_for('admin'))
 
 # @app.route('/admin')
-# @login_required
 # def admin_page():
-#     if not current_user.is_admin: 
+#     # Check if user is logged in
+#     if 'user_id' not in session:
+#         flash("You need to log in first.", "danger")
+#         return redirect(url_for('login_page'))
+
+#     # Get the logged-in user from DB
+#     user = User.query.get(session['user_id'])
+
+#     # Check if user is admin
+#     if not user.is_admin:
 #         flash("You do not have access to this page.", "danger")
 #         return redirect(url_for('home_page'))
-    
+
+#     # Only admin can reach this
 #     users = User.query.all()
 #     return render_template('admin.html', users=users)
+
 
 @app.route('/signup')
 def sign_up():

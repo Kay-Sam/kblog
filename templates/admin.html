@@ -4,11 +4,45 @@ Admin page
 {% endblock %}
 {% block content %}
 
-<h2>User List </h2>
-<ol>
-        {% for user in users %}
-            <li>{{ user.username }} - {{ user.email }} </li>
-        {% endfor %}
+<h1>Admin Dashboard</h1>
+
+<h2>Users</h2>
+<table>
+  <tr>
+    <th>Username</th>
+    <th>Post Count</th>
+    <th>Total Views</th>
+  </tr>
+  {% for stat in users %}
+  <tr>
+    <td>{{ stat.user.username }}</td>
+    <td>{{ stat.post_count }}</td>
+    <td>{{ stat.total_views }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h2>All Posts</h2>
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Author</th>
+    <th>Views</th>
+    <th>Action</th>
+  </tr>
+  {% for post in posts %}
+  <tr>
+    <td>{{ post.title }}</td>
+    <td>{{ post.user.username }}</td>
+    <td>{{ post.views }}</td>
+    <td>
+      <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}">
+        <button type="submit">Delete</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
 
 </ol>
 {% endblock  %}
