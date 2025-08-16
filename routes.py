@@ -14,7 +14,6 @@ import random,string
 from dotenv import load_dotenv
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy import func 
-from flask_login import current_user, login_required
 
 
 # Token serializer (used for email verification)
