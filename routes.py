@@ -51,14 +51,33 @@ def home_page(page=1):
     )
 
 @app.route('/admin')
-@login_required
 def admin_page():
-    if not current_user.is_admin: 
+    # Check if user is logged in
+    if 'user_id' not in session:
+        flash("You need to log in first.", "danger")
+        return redirect(url_for('login'))
+
+    # Get the logged-in user from DB
+    user = User.query.get(session['user_id'])
+
+    # Check if user is admin
+    if not user.is_admin:
         flash("You do not have access to this page.", "danger")
         return redirect(url_for('home_page'))
-    
+
+    # Only admin can reach this
     users = User.query.all()
     return render_template('admin.html', users=users)
+
+# @app.route('/admin')
+# @login_required
+# def admin_page():
+#     if not current_user.is_admin: 
+#         flash("You do not have access to this page.", "danger")
+#         return redirect(url_for('home_page'))
+    
+#     users = User.query.all()
+#     return render_template('admin.html', users=users)
 
 @app.route('/signup')
 def sign_up():
