@@ -7,7 +7,10 @@ import os
 
 app = Flask(__name__)
 
-if os.environ.get('FLASK_ENV') == 'production':
+# Use environment variable to select config
+ENV = os.environ.get('FLASK_ENV')
+
+if ENV == 'production':
     app.config.from_object(ProductionConfig)
 else:
     app.config.from_object(DevelopmentConfig)
