@@ -54,7 +54,7 @@ def admin_page():
     # Check if user is logged in
     if 'user_id' not in session:
         flash("You need to log in first.", "danger")
-        return redirect(url_for('login'))
+        return redirect(url_for('login_page'))
 
     # Get the logged-in user from DB
     user = User.query.get(session['user_id'])
