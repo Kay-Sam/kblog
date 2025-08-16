@@ -1,48 +1,78 @@
 {% extends 'base.html' %}
-{% block title %}
-Admin page
-{% endblock %}
+{% block title %}Admin Page{% endblock %}
+
 {% block content %}
+<div class="container mt-5 pt-5">
 
-<h1>Admin Dashboard</h1>
+    <h1 class="mb-4">Admin Dashboard</h1>
 
-<h2>Users</h2>
-<table>
-  <tr>
-    <th>Username</th>
-    <th>Post Count</th>
-    <th>Total Views</th>
-  </tr>
-  {% for stat in users %}
-  <tr>
-    <td>{{ stat.user.username }}</td>
-    <td>{{ stat.post_count }}</td>
-    <td>{{ stat.total_views }}</td>
-  </tr>
-  {% endfor %}
-</table>
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-<h2>All Posts</h2>
-<table>
-  <tr>
-    <th>Title</th>
-    <th>Author</th>
-    <th>Views</th>
-    <th>Action</th>
-  </tr>
-  {% for post in posts %}
-  <tr>
-    <td>{{ post.title }}</td>
-    <td>{{ post.user.username }}</td>
-    <td>{{ post.views }}</td>
-    <td>
-      <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}">
-        <button type="submit">Delete</button>
-      </form>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+    <!-- Users Table -->
+    <h3>Users</h3>
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Username</th>
+                <th>Post Count</th>
+                <th>Total Views</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in users %}
+            <tr>
+                <td>{{ stat.user.username }}</td>
+                <td>{{ stat.post_count }}</td>
+                <td>{{ stat.total_views }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-</ol>
-{% endblock  %}
+    <!-- Posts Table -->
+    <h3 class="mt-5">All Posts</h3>
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Views</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+            <tr>
+                <td>{{ post.title }}</td>
+                <td>{{ post.user.username }}</td>
+                <td>{{ post.views }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Are you sure you want to delete this post?');">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap JS (for alert dismissal and other JS features) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
