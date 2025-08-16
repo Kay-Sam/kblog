@@ -43,13 +43,14 @@ body {
 
 .navbar-toggler:focus {
   outline: none;
-  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.5); /* nice focus ring */
+  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.038); /* nice focus ring */
 }
 
 
-/* Alternatively, you can replace the icon with a custom SVG or character */
-.navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%23007bff' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+
+
+.navbar-custom .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 86, 179)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
 
