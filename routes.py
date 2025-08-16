@@ -14,6 +14,8 @@ import random,string
 from dotenv import load_dotenv
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy import func 
+from flask_login import current_user, login_required
+
 
 # Token serializer (used for email verification)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
@@ -29,10 +31,6 @@ def inject_user():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
     return dict(current_user=user)
-
-@app.route('/home')
-def home():
-    return render_template('home.html')
 
 @app.route('/')
 @app.route('/page/<int:page>')
@@ -52,37 +50,15 @@ def home_page(page=1):
         tags=tags
     )
 
-# @app.route('/page/<int:page>')
-# def home_page(page=1):
-#     current_user = None
-
-#     if 'user_id' in session:
-#         user_id = session['user_id']
-#         current_user = User.query.get(user_id)
-
-#     per_page = 6
-#     blogs = Blog.query.order_by(Blog.date_published.desc()).paginate(page=page, per_page=per_page)
-
-#     return render_template('index.html', current_user=current_user, blogs=blogs, session=session)
-
-
-# @app.route('/')
-# def home_page():
-#     current_user = None  # Initialize as None
-
-#     if 'user_id' in session:
-#         user_id = session['user_id']
-#         current_user = User.query.get(user_id)  # Fetch user from DB
-
-#     blogs = Blog.query.order_by(Blog.date_published.desc()).all()
-    
-#     return render_template('index.html', current_user=current_user, blogs=blogs, session=session)
-
-
 @app.route('/admin')
+@login_required
 def admin_page():
-   users=User.query.all()
-   return render_template('admin.html', users=users)
+    if not current_user.is_admin: 
+        flash("You do not have access to this page.", "danger")
+        return redirect(url_for('home_page'))
+    
+    users = User.query.all()
+    return render_template('admin.html', users=users)
 
 @app.route('/signup')
 def sign_up():

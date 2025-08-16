@@ -36,10 +36,9 @@
             <hr>
             
             <!-- Blog Description with Paragraphs -->
-            <div class="blog-description mb-4">
-                {{ blog.description.replace('\n', '</p><p>') | safe }}
-            </div>
-            
+        <div class="blog-description mb-4">
+            {{ blog.description | urlize(target="_blank") | safe }}
+        </div>
             <hr>
             
             <!-- Comments -->

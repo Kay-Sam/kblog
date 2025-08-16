@@ -12,6 +12,7 @@ class User(db.Model):
     verification_token = db.Column(db.String(100))
     reset_code = db.Column(db.String(10))
     reset_code_sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False)  
 
     # One-to-Many relationship with Blog    
     comments = db.relationship('Comment', backref='user', lazy=True)
