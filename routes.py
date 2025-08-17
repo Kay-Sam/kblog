@@ -508,6 +508,46 @@ def add_comment(blog_id):
 
     return redirect(url_for('view_blog', blog_id=blog_id))
 
+@app.route('/comment/<int:comment_id>/edit', methods=['GET', 'POST'])
+def edit_comment(comment_id):
+    if 'user_id' not in session:
+        flash("You must be logged in to edit a comment.", "danger")
+        return redirect(url_for('login_page'))
+
+    comment = Comment.query.get_or_404(comment_id)
+
+    # Only allow owner to edit
+    if comment.user_id != session['user_id']:
+        flash("You do not have permission to edit this comment.", "danger")
+        return redirect(url_for('view_blog', blog_id=comment.blog_id))
+
+    if request.method == 'POST':
+        comment.content = request.form['content']
+        db.session.commit()
+        flash("Comment updated successfully.", "success")
+        return redirect(url_for('view_blog', blog_id=comment.blog_id))
+
+    return render_template('edit_comment.html', comment=comment)
+
+
+@app.route('/comment/<int:comment_id>/delete', methods=['POST'])
+def delete_comment(comment_id):
+    if 'user_id' not in session:
+        flash("You must be logged in to delete a comment.", "danger")
+        return redirect(url_for('login_page'))
+
+    comment = Comment.query.get_or_404(comment_id)
+
+    # Only allow owner to delete
+    if comment.user_id != session['user_id']:
+        flash("You do not have permission to delete this comment.", "danger")
+        return redirect(url_for('view_blog', blog_id=comment.blog_id))
+
+    db.session.delete(comment)
+    db.session.commit()
+    flash("Comment deleted successfully.", "success")
+    return redirect(url_for('view_blog', blog_id=comment.blog_id))
+
 
 @app.route('/logout')
 def logout():

@@ -36,6 +36,9 @@ Home Page
                                     <small class="text-muted mb-2">
                                         <i class="fas fa-user"></i> {{ blog.user.username }}  
                                         <i class="fas fa-clock"></i> {{ blog.date_published.strftime('%b %d, %Y') }}
+                                         <a href="{{ url_for('view_blog', blog_id=blog.id) }}" class="" style="font-size: 15px;">
+        <i class="fas fa-comments"></i> {{ blog.comments|length }} comment{{ '' if blog.comments|length == 1 else 's' }}
+    </a>
                                     </small>
                                 </div>
 
