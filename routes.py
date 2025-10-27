@@ -1,10 +1,11 @@
 from datetime import timedelta
 import hashlib
+from threading import Thread
 import os
 from flask import flash, redirect, request, render_template, session, url_for, send_from_directory,abort, send_file
 import pathlib
 from flask_mail import Mail, Message
-from app import app,db,mail
+from app import app,db,mail, serializer
 from models import Blog, User, Comment, Category, Tag
 from auth import check_login
 from werkzeug.utils import secure_filename
@@ -127,6 +128,14 @@ def delete_post(post_id):
 def sign_up():
     return render_template('signup.html')
 
+# Helper function to send email in background
+def send_async_email(msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+        except Exception as e:
+            print(f"Mail sending failed: {e}")  # check Render logs
+
 @app.route('/do-signup', methods=['POST'])
 def do_signup():
     username = request.form.get('username')
@@ -136,42 +145,38 @@ def do_signup():
     confirmpassword = request.form.get('confirmpassword')
 
     # Validation
-    if username == '':
+    if not username:
         flash('Please enter your username!')
         return redirect(url_for('sign_up'))
-    elif email == '':
+    if not email:
         flash('Please enter your email')
         return redirect(url_for('sign_up'))
-    existing_user = User.query.filter(func.lower(User.username) == username.lower()).first()
-    if existing_user:
+    if User.query.filter(func.lower(User.username) == username.lower()).first():
         flash('Username already exists. Please use a different username.', 'error')
         return redirect(url_for('sign_up'))
-    
     if User.query.filter_by(email=email).first():
         flash('Email already exists. Please use a different email.', 'error')
         return redirect(url_for('sign_up'))
-    elif phone == '':
+    if not phone:
         flash('Please enter your Phone Number')
         return redirect(url_for('sign_up'))
-    elif password != confirmpassword:
+    if password != confirmpassword:
         flash('Passwords do not match')
         return redirect(url_for('sign_up'))
 
     # Hash password
-    pw = hashlib.sha256(password.encode()).hexdigest()
+    pw_hash = hashlib.sha256(password.encode()).hexdigest()
 
     # Create new user
-    new_user = User(username=username, email=email, phone=phone, password_hash=pw, is_verified=False)
+    new_user = User(username=username, email=email, phone=phone, password_hash=pw_hash, is_verified=False)
     db.session.add(new_user)
     db.session.commit()
 
-    # Create verification token
+    # Create verification token and URL
     token = serializer.dumps(email, salt='email-confirm')
-
-    # Create confirmation URL
     confirm_url = url_for('verify_email', token=token, _external=True)
 
-    # Send email
+    # Create email message
     msg = Message(
         subject='Verify Your Email',
         recipients=[email],
@@ -187,14 +192,81 @@ This link will expire in 1 hour.
 
 If you did not sign up, please ignore this email."""
     )
-    try:
-        mail.send(msg)
-        flash('A verification email has been sent. Please check your inbox.', 'info')
-    except Exception as e:
-        print(f"Mail sending error: {e}")  # This will appear in Render logs
-        flash('Signup successful, but verification email could not be sent.', 'warning')
-    
+
+    # Send email asynchronously
+    Thread(target=send_async_email, args=(msg,)).start()
+
+    flash('Signup successful! A verification email has been sent. Please check your inbox.', 'info')
     return redirect(url_for('login_page'))
+
+# @app.route('/do-signup', methods=['POST'])
+# def do_signup():
+#     username = request.form.get('username')
+#     email = request.form.get('email')
+#     phone = request.form.get('phone')
+#     password = request.form.get('password')
+#     confirmpassword = request.form.get('confirmpassword')
+
+#     # Validation
+#     if username == '':
+#         flash('Please enter your username!')
+#         return redirect(url_for('sign_up'))
+#     elif email == '':
+#         flash('Please enter your email')
+#         return redirect(url_for('sign_up'))
+#     existing_user = User.query.filter(func.lower(User.username) == username.lower()).first()
+#     if existing_user:
+#         flash('Username already exists. Please use a different username.', 'error')
+#         return redirect(url_for('sign_up'))
+    
+#     if User.query.filter_by(email=email).first():
+#         flash('Email already exists. Please use a different email.', 'error')
+#         return redirect(url_for('sign_up'))
+#     elif phone == '':
+#         flash('Please enter your Phone Number')
+#         return redirect(url_for('sign_up'))
+#     elif password != confirmpassword:
+#         flash('Passwords do not match')
+#         return redirect(url_for('sign_up'))
+
+#     # Hash password
+#     pw = hashlib.sha256(password.encode()).hexdigest()
+
+#     # Create new user
+#     new_user = User(username=username, email=email, phone=phone, password_hash=pw, is_verified=False)
+#     db.session.add(new_user)
+#     db.session.commit()
+
+#     # Create verification token
+#     token = serializer.dumps(email, salt='email-confirm')
+
+#     # Create confirmation URL
+#     confirm_url = url_for('verify_email', token=token, _external=True)
+
+#     # Send email
+#     msg = Message(
+#         subject='Verify Your Email',
+#         recipients=[email],
+#         body=f"""Hi {username},
+
+# Thank you for registering!
+
+# Click the link below to verify your email and activate your account:
+
+# {confirm_url}
+
+# This link will expire in 1 hour.
+
+# If you did not sign up, please ignore this email."""
+#     )
+#     try:
+#         mail.send(msg)
+#         flash('A verification email has been sent. Please check your inbox.', 'info')
+#     except Exception as e:
+#         print(f"Mail sending error: {e}")  # This will appear in Render logs
+#         flash('Signup successful, but verification email could not be sent.', 'warning')
+    
+#     return redirect(url_for('login_page'))
 
 @app.route('/verify-email/<token>')
 def verify_email(token):
