@@ -187,9 +187,13 @@ This link will expire in 1 hour.
 
 If you did not sign up, please ignore this email."""
     )
-    mail.send(msg)
-
-    flash('A verification email has been sent. Please check your inbox.', 'info')
+    try:
+        mail.send(msg)
+        flash('A verification email has been sent. Please check your inbox.', 'info')
+    except Exception as e:
+        print(f"Mail sending error: {e}")  # This will appear in Render logs
+        flash('Signup successful, but verification email could not be sent.', 'warning')
+    
     return redirect(url_for('login_page'))
 
 @app.route('/verify-email/<token>')
