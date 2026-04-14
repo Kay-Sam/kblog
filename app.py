@@ -7,7 +7,7 @@ import os
 
 app = Flask(__name__)
 
-# Use environment variable to select config
+# Use environment variable to select config.
 ENV = os.environ.get('FLASK_ENV')
 
 if ENV == 'production':
@@ -20,7 +20,7 @@ migrate = Migrate(app=app, db=db)
 mail = Mail(app)
 
 import routes
-import models
+import models 
 
 if __name__ == "__main__":
     app.run(debug=True)
