@@ -14,6 +14,7 @@ import random,string
 from dotenv import load_dotenv
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy import func 
+from flask_dance.contrib.google import google
 
 
 # Token serializer (used for email verification)
@@ -311,6 +312,41 @@ def add_post():
 def login_page():
     return render_template ('login.html')
 
+@app.route("/google-login")
+def google_login():
+    if not google.authorized:
+        return redirect(url_for("google.login"))
+
+    resp = google.get("/oauth2/v2/userinfo")
+
+    if not resp.ok:
+        flash("Failed to fetch user info from Google", "danger")
+        return redirect(url_for("login_page"))
+
+    info = resp.json()
+    email = info["email"]
+    username = info.get("name", email.split("@")[0])
+
+    # Check if user exists
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        user = User(
+            username=username,
+            email=email,
+            phone="",  # since your model requires phone
+            password_hash="",  # no password for Google users
+            is_verified=True
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    # Login user
+    session['user_id'] = user.id
+
+    flash("Logged in with Google!", "success")
+    return redirect(url_for("home_page"))
+    
 @app.route('/blog', methods=['GET', 'POST'])
 def create_blog():
     if 'user_id' not in session:
