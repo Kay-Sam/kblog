@@ -13,19 +13,19 @@ app = Flask(__name__)
 # Use environment variable to select config.
 app.config.from_object(ProductionConfig)
 
-# ✅ FORCE ENV LOAD
-app.config["GOOGLE_OAUTH_CLIENT_ID"] = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
-app.config["GOOGLE_OAUTH_CLIENT_SECRET"] = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
-
-print("CLIENT ID:", app.config["GOOGLE_OAUTH_CLIENT_ID"])
-
 google_bp = make_google_blueprint(
     client_id=app.config["GOOGLE_OAUTH_CLIENT_ID"],
     client_secret=app.config["GOOGLE_OAUTH_CLIENT_SECRET"],
+    scope=[
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email"
+    ],
     redirect_to="google_login"
 )
 
-db = SQLAlchemy(app)
+app.register_blueprint(google_bp, url_prefix="/login")
+
 migrate = Migrate(app=app, db=db)
 mail = Mail(app)
 
