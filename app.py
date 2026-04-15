@@ -11,29 +11,25 @@ os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
 app = Flask(__name__)
 
 # Use environment variable to select config.
-ENV = os.environ.get('FLASK_ENV')
+app.config.from_object(ProductionConfig)
 
-if ENV == 'production':
-    app.config.from_object(ProductionConfig)
-else:
-    app.config.from_object(DevelopmentConfig)
+# ✅ FORCE ENV LOAD
+app.config["GOOGLE_OAUTH_CLIENT_ID"] = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
+app.config["GOOGLE_OAUTH_CLIENT_SECRET"] = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
+
+print("CLIENT ID:", app.config["GOOGLE_OAUTH_CLIENT_ID"])
+
+google_bp = make_google_blueprint(
+    client_id=app.config["GOOGLE_OAUTH_CLIENT_ID"],
+    client_secret=app.config["GOOGLE_OAUTH_CLIENT_SECRET"],
+    redirect_to="google_login"
+)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app=app, db=db)
 mail = Mail(app)
 
-google_bp = make_google_blueprint(
-    client_id=app.config.get("GOOGLE_OAUTH_CLIENT_ID"),
-    client_secret=app.config.get("GOOGLE_OAUTH_CLIENT_SECRET"),
-    scope=[
-        "openid",
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/userinfo.email"
-    ],
-    redirect_to="google_login"
-)
 
-app.register_blueprint(google_bp, url_prefix="/login")
 
 import routes
 import models 
