@@ -440,7 +440,7 @@ def edit_blog(blog_id):
             # If a new image is uploaded, save it
             if image_file:
                 # Ensure it's an allowed file type (e.g., jpg, png, gif)
-                if image_file.filename.lower().endswith(('jpg', 'jpeg', 'png', 'gif')):
+                if image_file.filename.lower().endswith(('jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic', 'heif')):
                     image_filename = secure_filename(image_file.filename)
                     image_file.save(os.path.join('static/uploads', image_filename))
                     blog.image_filename = image_filename  # ✅ use the same name everywhere
@@ -736,7 +736,7 @@ def tag_blogs(tag_id):
 
 @app.route('/seed_categories')
 def seed_categories():
-    category_names = ['Technology', 'Health', 'Lifestyle', 'Education', 'Travel','Food']
+    category_names = ['Technology', 'Health', 'Lifestyle', 'Education', 'Travel','Food', 'Others']
     for name in category_names:
         if not Category.query.filter_by(name=name).first():
             db.session.add(Category(name=name))
@@ -871,3 +871,7 @@ def resend_reset():
 def download_db():
     db_path = pathlib.Path().absolute() / "data.db"
     return send_file(db_path, as_attachment=True)
+
+@app.route("/health")
+def health():
+    return "OK"
